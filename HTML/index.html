@@ -1,67 +1,191 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-    <meta charset="UTF-8">
-    <title>Student Lunch Finder</title>
-    <link rel="stylesheet" href="/CSS/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opiskelijaravintolat</title>
+  <link rel="stylesheet" href="/CSS/styles.css" />
+  
+  <script defer src="storage.js"></script>
+  <script defer src="api.js"></script>
+  <script defer src="auth.js"></script>
+  <script defer src="app.js"></script>
+  
 </head>
 <body>
+  <header class="header">
+    <div class="header__content">
+      <div>
+        
+        <h1>Opiskelijaravintolat ja ruokalistat</h1>
+        
+      </div>
 
-<header>
-    <h1>🍽️ Student Lunch Finder</h1>
-    <div class="header-actions">
-        <input type="text" placeholder="Hae ravintolaa...">
-        <button>Kirjaudu</button>
+      <div class="header__actions">
+        <button id="showLoginBtn" class="btn btn--ghost" type="button">Kirjaudu</button>
+        <button id="showRegisterBtn" class="btn btn--ghost" type="button">Rekisteröidy</button>
+        <button id="logoutBtn" class="btn btn--danger hidden" type="button">Kirjaudu ulos</button>
+      </div>
     </div>
-</header>
+  </header>
 
-<main>
-    <!-- Sidebar -->
+  <main class="layout">
     <aside class="sidebar">
-        <h2>Ravintolat</h2>
+      <section class="panel">
+        <div class="panel__header">
+          <h2>Suodattimet</h2>
+        </div>
 
-        <select>
-            <option>Kaikki kaupungit</option>
-            <option>Helsinki</option>
-            <option>Espoo</option>
-        </select>
+        <label class="field">
+          <span>Näkymä</span>
+          <select id="menuView">
+            <option value="today">Päivän ruokalista</option>
+            <option value="week">Viikon ruokalista</option>
+          </select>
+        </label>
 
-        <ul class="restaurant-list">
-            <li>Unicafe</li>
-            <li>Sodexo</li>
-            <li>Fazer</li>
-        </ul>
+        <label class="field">
+          <span>Kaupunki</span>
+          <select id="cityFilter">
+            <option value="all">Kaikki kaupungit</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Palveluntarjoaja</span>
+          <select id="providerFilter">
+            <option value="all">Kaikki tarjoajat</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header">
+          <h2>Ravintolat</h2>
+        </div>
+        <div id="restaurantList" class="restaurant-list"></div>
+      </section>
     </aside>
 
-    <!-- Content -->
     <section class="content">
-        <div class="restaurant-header">
-            <h2>Valitse ravintola</h2>
-            <div class="menu-buttons">
-                <button>Tänään</button>
-                <button>Tämä viikko</button>
-            </div>
+      <section id="userPanel" class="panel hidden">
+        <div class="panel__header">
+          <h2>Omat tiedot</h2>
         </div>
 
-        <div class="menu-container">
-            <div class="menu-card">
-                <h3>Pasta Bolognese</h3>
-                <p>Naudanliha, tomaatti</p>
-                <span class="price">2.95€</span>
-            </div>
-
-            <div class="menu-card">
-                <h3>Kasviskeitto</h3>
-                <p>Vegaaninen</p>
-                <span class="price">2.50€</span>
-            </div>
+        <div class="user-card">
+          <img id="profilePreview" class="profile-preview" alt="Profiilikuva" src="" />
+          <div>
+            <p><strong id="currentUserName"></strong></p>
+            <p id="currentUserEmail" class="muted"></p>
+            <p id="favoriteRestaurantText" class="muted"></p>
+          </div>
         </div>
+
+        <form id="profileForm" class="form-grid">
+          <label class="field">
+            <span>Nimi</span>
+            <input id="profileName" type="text" />
+          </label>
+
+          <label class="field">
+            <span>Sähköposti</span>
+            <input id="profileEmail" type="email" />
+          </label>
+
+          <label class="field">
+            <span>Profiilikuva</span>
+            <input id="profileImage" type="file" accept="image/*" />
+          </label>
+
+          <button class="btn" type="submit">Päivitä tiedot</button>
+          <p id="profileMessage" class="message"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header">
+          <h2 id="menuTitle">Ruokalista</h2>
+          <p id="menuSubtitle" class="muted">Valitse ravintola nähdäksesi ruokalistan.</p>
+        </div>
+
+        <article id="menuPanel" class="menu-panel">
+          <p class="muted">Ruokalista latautuu tähän.</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel__header">
+          <h2>Kartta</h2>
+          <p class="muted">Tähän voi myöhemmin lisätä kartan ja lähimmän ravintolan korostuksen.</p>
+        </div>
+        <div id="mapPanel" class="map-panel">
+          <p class="muted">Karttanäkymä ei ole vielä toteutettu.</p>
+        </div>
+      </section>
     </section>
-</main>
+  </main>
 
-<footer>
-    <p>© 2026 Student Lunch Finder</p>
-</footer>
+  <template id="restaurantTemplate">
+    <button class="restaurant-card" type="button">
+      <div>
+        <h3 class="restaurant-name"></h3>
+        <p class="restaurant-meta"></p>
+        <p class="restaurant-extra muted"></p>
+      </div>
+      <div class="restaurant-actions">
+        <span class="badge">Avaa</span>
+        <button class="favorite-btn" type="button">★</button>
+      </div>
+    </button>
+  </template>
 
+  <div id="authModal" class="modal hidden">
+    <div class="modal__content">
+      <button id="closeAuthModalBtn" class="modal__close" type="button">×</button>
+
+      <div class="auth-grid">
+        <section class="panel">
+          <h2>Kirjaudu sisään</h2>
+          <form id="loginForm" class="form-grid">
+            <label class="field">
+              <span>Sähköposti</span>
+              <input id="loginEmail" type="email" required />
+            </label>
+            <label class="field">
+              <span>Salasana</span>
+              <input id="loginPassword" type="password" required />
+            </label>
+            <button class="btn" type="submit">Kirjaudu</button>
+            <p id="loginMessage" class="message"></p>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Rekisteröidy</h2>
+          <form id="registerForm" class="form-grid">
+            <label class="field">
+              <span>Nimi</span>
+              <input id="registerName" type="text" required />
+            </label>
+            <label class="field">
+              <span>Sähköposti</span>
+              <input id="registerEmail" type="email" required />
+            </label>
+            <label class="field">
+              <span>Salasana</span>
+              <input id="registerPassword" type="password" required minlength="4" />
+            </label>
+            <label class="field">
+              <span>Vahvista salasana</span>
+              <input id="registerPasswordConfirm" type="password" required minlength="4" />
+            </label>
+            <button class="btn" type="submit">Rekisteröidy</button>
+            <p id="registerMessage" class="message"></p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
