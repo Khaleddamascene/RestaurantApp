@@ -4,33 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Opiskelijaravintolat</title>
-  <link rel="stylesheet" href="../CSS/styles.css" />
-  
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="../styles/styles.css" />
+
+  <!-- Muut scriptit 
   <script defer src="../JS/storage.js"></script>
-  <script defer src="../JS/api.js"></script>
-  <script defer src="../JS/auth.js"></script>
-  <script defer src="../JS/app.js"></script>
-  
+  <script defer src="../JS/auth.js"></script>-->
+
+  <!-- TÄRKEÄ: module -->
+  <script type="module" src="../JS/app.js"></script>
 </head>
+
 <body>
+  <!-- HEADER -->
   <header class="header">
     <div class="header__content">
-      <div>
-        
-        <h1>Opiskelijaravintolat ja ruokalistat</h1>
-        
-      </div>
+      <h1>Opiskelijaravintolat ja ruokalistat</h1>
 
       <div class="header__actions">
-        <button id="showLoginBtn" class="btn btn--ghost" type="button">Kirjaudu</button>
-        <button id="showRegisterBtn" class="btn btn--ghost" type="button">Rekisteröidy</button>
-        <button id="logoutBtn" class="btn btn--danger hidden" type="button">Kirjaudu ulos</button>
+        <button id="showLoginBtn" class="btn btn--ghost">Kirjaudu</button>
+        <button id="showRegisterBtn" class="btn btn--ghost">Rekisteröidy</button>
+        <button id="logoutBtn" class="btn btn--danger hidden">Kirjaudu ulos</button>
       </div>
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="layout">
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
+
+      <!-- FILTERIT -->
       <section class="panel">
         <div class="panel__header">
           <h2>Suodattimet</h2>
@@ -59,22 +69,27 @@
         </label>
       </section>
 
+      <!-- RAVINTOLAT -->
       <section class="panel">
         <div class="panel__header">
           <h2>Ravintolat</h2>
         </div>
         <div id="restaurantList" class="restaurant-list"></div>
       </section>
+
     </aside>
 
+    <!-- CONTENT -->
     <section class="content">
+
+      <!-- USER PANEL -->
       <section id="userPanel" class="panel hidden">
         <div class="panel__header">
           <h2>Omat tiedot</h2>
         </div>
 
         <div class="user-card">
-          <img id="profilePreview" class="profile-preview" alt="Profiilikuva" src="" />
+          <img id="profilePreview" class="profile-preview" alt="Profiilikuva" />
           <div>
             <p><strong id="currentUserName"></strong></p>
             <p id="currentUserEmail" class="muted"></p>
@@ -103,10 +118,13 @@
         </form>
       </section>
 
+      <!-- MENU -->
       <section class="panel">
         <div class="panel__header">
           <h2 id="menuTitle">Ruokalista</h2>
-          <p id="menuSubtitle" class="muted">Valitse ravintola nähdäksesi ruokalistan.</p>
+          <p id="menuSubtitle" class="muted">
+            Valitse ravintola nähdäksesi ruokalistan.
+          </p>
         </div>
 
         <article id="menuPanel" class="menu-panel">
@@ -114,37 +132,45 @@
         </article>
       </section>
 
+      <!-- KARTTA -->
       <section class="panel">
         <div class="panel__header">
           <h2>Kartta</h2>
-          <p class="muted">Tähän voi myöhemmin lisätä kartan ja lähimmän ravintolan korostuksen.</p>
+          <p class="muted">
+            Karttanäkymä voidaan lisätä tähän (Leaflet).
+          </p>
         </div>
-        <div id="mapPanel" class="map-panel">
-          <p class="muted">Karttanäkymä ei ole vielä toteutettu.</p>
-        </div>
+
+        <div id="mapPanel" class="map-panel"></div>
       </section>
+
     </section>
   </main>
 
+  <!-- TEMPLATE -->
   <template id="restaurantTemplate">
-    <button class="restaurant-card" type="button">
+    <div class="restaurant-card">
       <div>
         <h3 class="restaurant-name"></h3>
         <p class="restaurant-meta"></p>
         <p class="restaurant-extra muted"></p>
       </div>
+
       <div class="restaurant-actions">
         <span class="badge">Avaa</span>
         <button class="favorite-btn" type="button">★</button>
       </div>
-    </button>
+    </div>
   </template>
 
+  <!-- AUTH MODAL -->
   <div id="authModal" class="modal hidden">
     <div class="modal__content">
-      <button id="closeAuthModalBtn" class="modal__close" type="button">×</button>
+      <button id="closeAuthModalBtn" class="modal__close">×</button>
 
       <div class="auth-grid">
+
+        <!-- LOGIN -->
         <section class="panel">
           <h2>Kirjaudu sisään</h2>
           <form id="loginForm" class="form-grid">
@@ -152,15 +178,18 @@
               <span>Sähköposti</span>
               <input id="loginEmail" type="email" required />
             </label>
+
             <label class="field">
               <span>Salasana</span>
               <input id="loginPassword" type="password" required />
             </label>
-            <button class="btn" type="submit">Kirjaudu</button>
+
+            <button class="btn">Kirjaudu</button>
             <p id="loginMessage" class="message"></p>
           </form>
         </section>
 
+        <!-- REGISTER -->
         <section class="panel">
           <h2>Rekisteröidy</h2>
           <form id="registerForm" class="form-grid">
@@ -168,24 +197,30 @@
               <span>Nimi</span>
               <input id="registerName" type="text" required />
             </label>
+
             <label class="field">
               <span>Sähköposti</span>
               <input id="registerEmail" type="email" required />
             </label>
+
             <label class="field">
               <span>Salasana</span>
               <input id="registerPassword" type="password" required minlength="4" />
             </label>
+
             <label class="field">
               <span>Vahvista salasana</span>
               <input id="registerPasswordConfirm" type="password" required minlength="4" />
             </label>
-            <button class="btn" type="submit">Rekisteröidy</button>
+
+            <button class="btn">Rekisteröidy</button>
             <p id="registerMessage" class="message"></p>
           </form>
         </section>
+
       </div>
     </div>
   </div>
+
 </body>
 </html>
