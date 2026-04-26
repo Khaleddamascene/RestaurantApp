@@ -4,6 +4,12 @@ import {
   getWeeklyMenu,
 } from "./api.js";
 
+import {
+  initMap,
+  renderMapRestaurants,
+  focusRestaurantOnMap
+} from "./map.js";
+
 // DOM
 const restaurantList = document.getElementById("restaurantList");
 const restaurantTemplate = document.getElementById("restaurantTemplate");
@@ -21,14 +27,16 @@ let restaurants = [];
 let selectedRestaurant = null;
 
 // 🚀 INIT
-init();
-
 async function init() {
   try {
     restaurants = await getRestaurants();
 
+    initMap(); // 🗺️
+
     populateFilters(restaurants);
     renderRestaurants(restaurants);
+
+    renderMapRestaurants(restaurants); // 🗺️
   } catch (err) {
     restaurantList.innerHTML = "Virhe ladattaessa ravintoloita";
   }
@@ -92,14 +100,15 @@ function renderRestaurants(data) {
     meta.textContent = `${restaurant.city} • ${restaurant.company}`;
     extra.textContent = restaurant.address;
 
-    // Klikkaus → menu
+    // ✅ KLIKKAUS (korjattu)
     card.addEventListener("click", () => {
       selectedRestaurant = restaurant;
       loadMenu();
       highlightSelected(card);
+
+      focusRestaurantOnMap(restaurant); // 🗺️
     });
 
-    // ⭐ suosikki (demo localStorage)
     favBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       localStorage.setItem("favoriteRestaurant", restaurant._id);
@@ -142,17 +151,13 @@ function renderDailyMenu(data) {
     return;
   }
 
-  menuPanel.innerHTML = data.courses
-    .map(
-      c => `
-      <div class="menu-item">
-        <h3>${c.name}</h3>
-        <p>${c.price || ""}</p>
-        <p class="muted">${c.diets || ""}</p>
-      </div>
-    `
-    )
-    .join("");
+  menuPanel.innerHTML = data.courses.map(c => `
+    <div class="menu-item">
+      <h3>${c.name}</h3>
+      <p>${c.price || ""}</p>
+      <p class="muted">${c.diets || ""}</p>
+    </div>
+  `).join("");
 }
 
 // 📅 Viikko
@@ -162,27 +167,19 @@ function renderWeeklyMenu(data) {
     return;
   }
 
-  menuPanel.innerHTML = data.days
-    .map(
-      day => `
-      <div class="menu-day">
-        <h3>${day.date}</h3>
-        ${
-          day.courses
-            ?.map(
-              c => `
-            <div class="menu-item">
-              <strong>${c.name}</strong>
-              <span>${c.price || ""}</span>
-            </div>
-          `
-            )
-            .join("") || "<p>Ei ruokia</p>"
-        }
-      </div>
-    `
-    )
-    .join("");
+  menuPanel.innerHTML = data.days.map(day => `
+    <div class="menu-day">
+      <h3>${day.date}</h3>
+      ${
+        day.courses?.map(c => `
+          <div class="menu-item">
+            <strong>${c.name}</strong>
+            <span>${c.price || ""}</span>
+          </div>
+        `).join("") || "<p>Ei ruokia</p>"
+      }
+    </div>
+  `).join("");
 }
 
 // 🔽 UI
@@ -200,3 +197,8 @@ function highlightSelected(selectedCard) {
 cityFilter.addEventListener("change", applyFilters);
 providerFilter.addEventListener("change", applyFilters);
 menuView.addEventListener("change", loadMenu);
+
+// 🚀 käynnistys (vain kerran!)
+document.addEventListener("DOMContentLoaded", () => {
+  init();
+});

@@ -84,3 +84,4 @@ export async function updateUser(token, data) {
     body: JSON.stringify(data),
   });
 }
+

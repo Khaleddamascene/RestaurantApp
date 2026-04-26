@@ -4,16 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Opiskelijaravintolat</title>
-  
 
   <link rel="stylesheet" href="../styles/styles.css" />
-
-  <!-- Muut scriptit 
-  <script defer src="../JS/storage.js"></script>
-  <script defer src="../JS/auth.js"></script>-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
   <!-- TÄRKEÄ: module -->
   <script type="module" src="../JS/app.js"></script>
+  <script type="module" src="../JS/auth.js"></script>
+
+
+
 </head>
 
 <body>
@@ -67,10 +69,12 @@
 
       <!-- RAVINTOLAT -->
       <section class="panel">
-        <div class="panel__header">
-          <h2>Ravintolat</h2>
-        </div>
+        <h2>Ravintolat</h2>
         <div id="restaurantList" class="restaurant-list"></div>
+        <div class="panel__header">
+  
+        </div>
+       
       </section>
 
     </aside>
@@ -80,6 +84,7 @@
 
       <!-- USER PANEL -->
       <section id="userPanel" class="panel hidden">
+         <div id="restaurantList" class="restaurant-list"></div>
         <div class="panel__header">
           <h2>Omat tiedot</h2>
         </div>
@@ -138,6 +143,7 @@
         </div>
 
         <div id="mapPanel" class="map-panel"></div>
+      
       </section>
 
     </section>
