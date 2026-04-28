@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profiili</title>
+
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <link rel="stylesheet" href="../styles/profile.css" />
+  <script type="module" src="../JS/profile.js"></script>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header__content">
+    <h1>Oma profiili</h1>
+
+    <div class="header__actions">
+      <a href="index.html" class="btn btn--ghost">← Takaisin</a>
+      <button id="logoutBtn" class="btn btn--danger">Kirjaudu ulos</button>
+    </div>
+  </div>
+</header>
+
+<main class="profile-layout">
+
+  <!-- ================= LEFT: PROFILE CARD ================= -->
+  <section class="profile-card">
+    <div class="profile-header">
+      <img id="profilePreview" class="profile-avatar" src="" alt="Profiilikuva" />
+
+      <h2 id="currentUserName"></h2>
+      <p id="currentUserEmail" class="muted"></p>
+      <p id="favoriteRestaurantText" class="muted"></p>
+    </div>
+  </section>
+
+  <!-- ================= RIGHT SIDE ================= -->
+  <div class="profile-content">
+
+    <!-- ===== UPDATE INFO ===== -->
+    <section class="profile-section">
+      <h2>Päivitä tiedot</h2>
+
+      <form id="profileForm" class="profile-form">
+
+        <label class="field">
+          <span>Nimi</span>
+          <input id="profileName" type="text" />
+        </label>
+
+        <label class="field">
+          <span>Sähköposti</span>
+          <input id="profileEmail" type="email" />
+        </label>
+
+        <label class="field">
+          <span>Profiilikuva</span>
+          <input id="profileImage" type="file" accept="image/*" />
+        </label>
+
+        <button class="btn btn--primary" type="submit">
+          Tallenna muutokset
+        </button>
+
+        <p id="profileMessage" class="message"></p>
+
+      </form>
+    </section>
+
+    <!-- ===== CHANGE PASSWORD ===== -->
+    <section class="profile-section">
+      <h2>Vaihda salasana</h2>
+
+      <form id="passwordForm" class="form-grid">
+
+        <label class="field">
+          <span>Nykyinen salasana</span>
+          <input id="currentPassword" type="password" required />
+        </label>
+
+        <label class="field">
+          <span>Uusi salasana</span>
+          <input id="newPassword" type="password" required minlength="6" />
+        </label>
+
+        <label class="field">
+          <span>Vahvista uusi salasana</span>
+          <input id="confirmNewPassword" type="password" required minlength="6" />
+        </label>
+
+        <button class="btn btn--primary" type="submit">
+          Vaihda salasana
+        </button>
+
+        <p id="passwordMessage" class="message"></p>
+
+      </form>
+    </section>
+
+  </div>
+
+</main>
+
+</body>
+</html>
