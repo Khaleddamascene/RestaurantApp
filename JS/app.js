@@ -20,6 +20,38 @@ import {
   getUsers
 } from "./auth.js";
 
+
+// =====================
+// HELPERS (FIX IS HERE)
+// =====================
+
+function formatDiets(raw) {
+  if (!raw) return "";
+
+  let arr = [];
+
+  // string
+  if (typeof raw === "string") {
+    arr = raw.split(",");
+  }
+
+  // array
+  else if (Array.isArray(raw)) {
+    arr = raw;
+  }
+
+  // object fallback
+  else if (typeof raw === "object") {
+    arr = Object.values(raw);
+  }
+
+  return arr
+    .map(x => String(x).trim())
+    .filter(x => x && x !== "*")
+    .map(x => `<span class="tag">${x}</span>`)
+    .join(" ");
+}
+
 // =====================
 // DOM
 // =====================
@@ -52,11 +84,11 @@ const dom = {
   logoutBtn: document.getElementById("logoutBtn")
 };
 
+
 // =====================
 // INIT
 // =====================
 document.addEventListener("DOMContentLoaded", init);
-
 window.addEventListener("auth-changed", updateUserUI);
 
 async function init() {
@@ -72,6 +104,7 @@ async function init() {
   setupEvents();
   updateUserUI();
 }
+
 
 // =====================
 // FILTERS
@@ -97,6 +130,7 @@ function applyFilters() {
 
   renderRestaurants(filtered);
 }
+
 
 // =====================
 // RESTAURANTS
@@ -127,6 +161,7 @@ function renderRestaurants(data) {
   });
 }
 
+
 // =====================
 // MENU
 // =====================
@@ -149,36 +184,54 @@ async function loadMenu() {
     : renderWeekly(data);
 }
 
+
 // =====================
-// MENU RENDER
+// MENU RENDER (FIXED)
 // =====================
 function renderDaily(data) {
   dom.menuPanel.innerHTML =
     data?.courses?.length
       ? data.courses.map(c => `
         <div class="menu-item">
-          <h3>${c.name}</h3>
-          <p>${c.price || ""}</p>
+          <div class="menu-item__left">
+            <h3>${c.name}</h3>
+            <div class="menu-item-diets">
+              ${formatDiets(c.diets || c.allergens || c.properties)}
+            </div>
+          </div>
+          <div class="menu-item__right">
+            <span class="menu-price">${c.price || ""}</span>
+          </div>
         </div>
       `).join("")
-      : "<p>Ei ruokia</p>";
+      : "<p class='menu-empty'>Ei ruokia tänään</p>";
 }
+
 function renderWeekly(data) {
   dom.menuPanel.innerHTML =
     data?.days?.length
       ? data.days.map(d => `
         <div class="menu-day">
-          <h3>${d.date}</h3>
+          <div class="menu-day-header"><h3>${d.date}</h3></div>
+
           ${d.courses?.map(c => `
             <div class="menu-item">
-              <strong>${c.name}</strong>
-              <p>${c.price || ""}</p>
+              <div class="menu-item__left">
+                <strong>${c.name}</strong>
+                <div class="menu-item-diets">
+                  ${formatDiets(c.diets || c.allergens || c.properties)}
+                </div>
+              </div>
+              <div class="menu-item__right">
+                <span class="menu-price">${c.price || ""}</span>
+              </div>
             </div>
-          `).join("") || "<p>Ei ruokia</p>"}
+          `).join("") || "<p class='menu-empty'>Ei ruokia</p>"}
         </div>
       `).join("")
-      : "<p>Ei viikkoruokaa</p>";
+      : "<p class='menu-empty'>Ei viikkoruokaa</p>";
 }
+
 
 // =====================
 // UI HELPERS
@@ -189,6 +242,7 @@ function highlight(card) {
 
   card.classList.add("active");
 }
+
 
 // =====================
 // AUTH UI
@@ -201,34 +255,24 @@ function setupAuthUI() {
   dom.showRegisterBtn.onclick = () =>
     dom.modal.classList.remove("hidden");
 
-    dom.loginForm.addEventListener("submit", e => {
+  dom.loginForm.addEventListener("submit", e => {
     e.preventDefault();
 
     const emailInput = document.getElementById("loginEmail");
     const passwordInput = document.getElementById("loginPassword");
     const msg = document.getElementById("loginMessage");
 
-    // reset
     msg.textContent = "";
     msg.classList.remove("error", "success");
-    emailInput.classList.remove("input-error");
-    passwordInput.classList.remove("input-error");
 
     try {
       login(emailInput.value, passwordInput.value);
-
-      // ✅ onnistui
       dom.modal.classList.add("hidden");
-
     } catch (err) {
-      // ❌ virhe tulee tänne
       msg.textContent = "Väärä sähköposti tai salasana";
       msg.classList.add("error");
-
-      emailInput.classList.add("input-error");
-      passwordInput.classList.add("input-error");
     }
-});
+  });
 
   dom.registerForm.addEventListener("submit", e => {
     e.preventDefault();
@@ -251,8 +295,9 @@ function setupAuthUI() {
   });
 }
 
+
 // =====================
-// USER SYSTEM (FINAL FIX)
+// USER SYSTEM
 // =====================
 function updateUserUI() {
   const user = getCurrentUser();
@@ -269,9 +314,7 @@ function updateUserUI() {
   dom.showLoginBtn.classList.add("hidden");
   dom.showRegisterBtn.classList.add("hidden");
 
- dom.userNameDisplay.textContent = user?.name
-  ? `Hei, ${user.name}`
-  : "Hei";
+  dom.userNameDisplay.textContent = `Hei, ${user.name || "käyttäjä"}`;
 
   const users = getUsers();
   const fullUser = users.find(u => u.email === user.email);
@@ -280,6 +323,7 @@ function updateUserUI() {
     fullUser?.image ||
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7'/%3E%3C/svg%3E";
 }
+
 
 // =====================
 // EVENTS
@@ -308,12 +352,11 @@ function setupEvents() {
   });
 
   dom.logoutBtn.addEventListener("click", () => {
-    logout(); 
+    logout();
   });
 
-    // ✅ TÄMÄ LISÄYS
-  const closeAuthModalBtn = document.getElementById("closeAuthModalBtn");
-  closeAuthModalBtn.addEventListener("click", () => {
-    dom.modal.classList.add("hidden");
-  });
+  document.getElementById("closeAuthModalBtn")
+    .addEventListener("click", () => {
+      dom.modal.classList.add("hidden");
+    });
 }
