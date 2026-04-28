@@ -1,0 +1,365 @@
+/* ============================================================
+   PROFILE PAGE — Nordic Dark Minimalism
+   Väripaletti: Tumma liuskekivi + hapankirsikka-aksentti
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --c-bg:          #0f1115;
+  --c-surface:     #181b22;
+  --c-surface-2:   #1f232d;
+  --c-border:      #2a2e3a;
+  --c-border-hover:#3d4255;
+  --c-accent:      #c0392b;
+  --c-accent-soft: rgba(192, 57, 43, 0.12);
+  --c-accent-glow: rgba(192, 57, 43, 0.25);
+  --c-text:        #e8e6e0;
+  --c-muted:       #7a7f8e;
+  --c-muted-2:     #4d5160;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --transition: 160ms ease;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  background: var(--c-bg);
+  color: var(--c-text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.header__content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--c-text);
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* ── BUTTONS ── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.45rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), transform 80ms ease, box-shadow var(--transition);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.btn:active { transform: scale(0.975); }
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--c-border);
+  color: var(--c-muted);
+}
+.btn--ghost:hover {
+  border-color: var(--c-border-hover);
+  color: var(--c-text);
+  background: var(--c-surface-2);
+}
+
+.btn--primary {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+  box-shadow: 0 0 0 0 var(--c-accent-glow);
+}
+.btn--primary:hover {
+  background: #a93226;
+  border-color: #a93226;
+  box-shadow: 0 4px 18px var(--c-accent-glow);
+}
+
+.btn--danger {
+  background: transparent;
+  border-color: #4a2020;
+  color: #c0392b;
+}
+.btn--danger:hover {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: #c0392b;
+}
+
+/* ── LAYOUT ── */
+
+.profile-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.25rem 4rem;
+  }
+}
+
+/* ── PROFILE CARD (left column) ── */
+
+.profile-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 2rem 1.5rem;
+  position: sticky;
+  top: 82px;
+  overflow: hidden;
+}
+
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-accent), transparent 70%);
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--c-border);
+  background: var(--c-surface-2);
+  transition: border-color var(--transition);
+  /* graceful fallback when src is empty */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%231f232d'/%3E%3Ccircle cx='50' cy='40' r='18' fill='%232a2e3a'/%3E%3Cellipse cx='50' cy='80' rx='28' ry='20' fill='%232a2e3a'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.profile-avatar:hover {
+  border-color: var(--c-accent);
+}
+
+#currentUserName {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--c-text);
+  line-height: 1.3;
+}
+
+#currentUserEmail,
+#favoriteRestaurantText,
+.muted {
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+  line-height: 1.5;
+}
+
+/* ── RIGHT SIDE CONTENT ── */
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── SECTION CARD ── */
+
+.profile-section {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  transition: border-color var(--transition);
+}
+
+.profile-section:focus-within {
+  border-color: var(--c-border-hover);
+}
+
+.profile-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--c-text);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--c-border);
+  letter-spacing: 0.01em;
+}
+
+/* ── FORMS ── */
+
+.profile-form,
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  cursor: pointer;
+}
+
+.field span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"] {
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9375rem;
+  padding: 0.65rem 0.875rem;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition),
+              box-shadow var(--transition);
+  width: 100%;
+}
+
+.field input[type="text"]:hover,
+.field input[type="email"]:hover,
+.field input[type="password"]:hover {
+  border-color: var(--c-border-hover);
+}
+
+.field input[type="text"]:focus,
+.field input[type="email"]:focus,
+.field input[type="password"]:focus {
+  border-color: var(--c-accent);
+  background: var(--c-bg);
+  box-shadow: 0 0 0 3px var(--c-accent-soft);
+}
+
+.field input::placeholder {
+  color: var(--c-muted-2);
+}
+
+/* File input */
+
+.field input[type="file"] {
+  background: var(--c-surface-2);
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8125rem;
+  padding: 0.75rem 0.875rem;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.field input[type="file"]:hover {
+  border-color: var(--c-accent);
+  color: var(--c-text);
+}
+
+/* Submit button spacing */
+
+.profile-form .btn,
+.form-grid .btn {
+  align-self: flex-start;
+  margin-top: 0.375rem;
+}
+
+/* ── MESSAGE ── */
+
+.message {
+  font-size: 0.8125rem;
+  min-height: 1.2em;
+  color: var(--c-muted);
+  transition: color var(--transition);
+}
+
+.message.success { color: #4caf72; }
+.message.error   { color: var(--c-accent); }
+
+/* ── SCROLLBAR ── */
+
+::-webkit-scrollbar          { width: 6px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--c-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-border-hover); }
+
+/* ── ANIMATIONS ── */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profile-card    { animation: fadeSlideUp 0.35s ease both; }
+.profile-section { animation: fadeSlideUp 0.35s ease both; }
+.profile-section:nth-child(1) { animation-delay: 0.08s; }
+.profile-section:nth-child(2) { animation-delay: 0.16s; }
