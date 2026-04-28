@@ -17,7 +17,11 @@ import {
   register,
   logout,
   getCurrentUser,
-  getUsers
+  getUsers,
+
+  getFavorites,      
+  saveFavorites  
+
 } from "./auth.js";
 
 
@@ -138,6 +142,9 @@ function applyFilters() {
 function renderRestaurants(data) {
   dom.restaurantList.innerHTML = "";
 
+  const user = getCurrentUser();
+  const favIds = user ? getFavorites(user.id) : [];
+
   data.forEach(r => {
     const clone = dom.restaurantTemplate.content.cloneNode(true);
 
@@ -146,9 +153,41 @@ function renderRestaurants(data) {
     const meta = clone.querySelector(".restaurant-meta");
     const extra = clone.querySelector(".restaurant-extra");
 
+    const favBtn = clone.querySelector(".favorite-btn");
+
     name.textContent = r.name;
     meta.textContent = `${r.city} • ${r.company}`;
     extra.textContent = r.address || "";
+
+        // Aseta tähti aktiiviseksi jos suosikki
+    const isFav = favIds.includes(r._id);
+    favBtn.classList.toggle("active", isFav);
+    favBtn.title = isFav ? "Poista suosikeista" : "Lisää suosikkeihin";
+
+    favBtn.addEventListener("click", e => {
+      e.stopPropagation(); // älä valitse ravintolaa
+
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        dom.modal.classList.remove("hidden"); // pyydä kirjautumaan
+        return;
+      }
+
+      const favs = getFavorites(currentUser.id);
+      const idx  = favs.indexOf(r._id);
+
+      if (idx === -1) {
+        favs.push(r._id);
+        favBtn.classList.add("active");
+        favBtn.title = "Poista suosikeista";
+      } else {
+        favs.splice(idx, 1);
+        favBtn.classList.remove("active");
+        favBtn.title = "Lisää suosikkeihin";
+      }
+
+      saveFavorites(currentUser.id, favs);
+    });
 
     card.addEventListener("click", () => {
       state.selectedRestaurant = r;
@@ -307,6 +346,9 @@ function updateUserUI() {
     dom.showLoginBtn.classList.remove("hidden");
     dom.showRegisterBtn.classList.remove("hidden");
     dom.userNameDisplay.textContent = "";
+
+    renderRestaurants(state.restaurants);
+
     return;
   }
 
@@ -322,6 +364,8 @@ function updateUserUI() {
   dom.profileAvatarBtn.src =
     fullUser?.image ||
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7'/%3E%3C/svg%3E";
+
+   renderRestaurants(state.restaurants); // ← lisää tämä — päivittää tähdet kirjautumisen jälkeen
 }
 
 
@@ -360,3 +404,13 @@ function setupEvents() {
       dom.modal.classList.add("hidden");
     });
 }
+
+
+dom.goProfileBtn.addEventListener("click", () => {
+  window.location.href = "profile.html";
+});
+
+// ← lisää tämä
+document.getElementById("goFavoritesBtn")?.addEventListener("click", () => {
+  window.location.href = "favorites.html";
+});

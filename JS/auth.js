@@ -134,3 +134,15 @@ export function changePassword(email, currentPassword, newPassword) {
 
   return true;
 }
+
+
+// =====================
+// FAVORITES
+// =====================
+export function getFavorites(userId) {
+  return JSON.parse(localStorage.getItem(`favorites_${userId}`) || "[]");
+}
+
+export function saveFavorites(userId, favorites) {
+  localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
+}
