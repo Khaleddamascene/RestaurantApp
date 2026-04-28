@@ -1,25 +1,59 @@
-let currentUser = null;
+// auth.js 
 
-function getUsers() {
-  return JSON.parse(localStorage.getItem("users")) || [];
+const USERS_KEY = "users";
+const CURRENT_KEY = "currentUser";
+
+// =====================
+// STORAGE
+// =====================
+export function getUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
 }
 
-function saveUsers(users) {
-  localStorage.setItem("users", JSON.stringify(users));
-}
-
-function saveSession(user) {
-  localStorage.setItem("currentUser", JSON.stringify(user));
-}
-
-export function loadSession() {
-  const user = localStorage.getItem("currentUser");
-  if (user) currentUser = JSON.parse(user);
-  return currentUser;
+export function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
 export function getCurrentUser() {
-  return currentUser;
+  return JSON.parse(localStorage.getItem(CURRENT_KEY));
+}
+
+export function setCurrentUser(user) {
+  localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
+
+  
+  window.dispatchEvent(new Event("auth-changed"));
+}
+
+export function logout() {
+  localStorage.removeItem(CURRENT_KEY);
+
+ 
+  window.dispatchEvent(new Event("auth-changed"));
+}
+
+// =====================
+// LOGIN
+// =====================
+export function login(email, password) {
+  const users = getUsers();
+
+  const user = users.find(
+    u => u.email === email && u.password === password
+  );
+
+  if (!user) throw new Error("Invalid login");
+
+  const sessionUser = {
+    id: user.id || crypto.randomUUID(),
+    name: user.name,
+    email: user.email,
+    image: user.image || ""
+  };
+
+  setCurrentUser(sessionUser);
+
+  return sessionUser;
 }
 
 // =====================
@@ -28,8 +62,8 @@ export function getCurrentUser() {
 export function register(name, email, password) {
   const users = getUsers();
 
-  if (users.find(u => u.email === email)) {
-    throw new Error("Sähköposti on jo käytössä");
+  if (users.some(u => u.email === email)) {
+    throw new Error("Email already exists");
   }
 
   const newUser = {
@@ -43,55 +77,60 @@ export function register(name, email, password) {
   users.push(newUser);
   saveUsers(users);
 
+  const sessionUser = {
+    id: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+    image: ""
+  };
+
+  setCurrentUser(sessionUser);
+
   return newUser;
 }
 
 // =====================
-// LOGIN
+// UPDATE PROFILE
 // =====================
-export function login(email, password) {
+export function updateUser(updated) {
   const users = getUsers();
 
-  const user = users.find(
-    u => u.email === email && u.password === password
-  );
+  const idx = users.findIndex(u => u.email === updated.email);
+  if (idx === -1) return;
 
-  if (!user) {
-    throw new Error("Väärä sähköposti tai salasana");
-  }
-
-  currentUser = user;
-  saveSession(user);
-
-  return user;
-}
-
-// =====================
-// LOGOUT
-// =====================
-export function logout() {
-  currentUser = null;
-  localStorage.removeItem("currentUser");
-}
-
-// =====================
-// UPDATE USER
-// =====================
-export function updateUser(data) {
-  const users = getUsers();
-
-  const index = users.findIndex(u => u.id === currentUser.id);
-  if (index === -1) return;
-
-  users[index] = {
-    ...users[index],
-    ...data
+  users[idx] = {
+    ...users[idx],
+    ...updated
   };
 
   saveUsers(users);
 
-  currentUser = users[index];
-  saveSession(currentUser);
+  setCurrentUser({
+    id: users[idx].id,
+    name: users[idx].name,
+    email: users[idx].email,
+    image: users[idx].image || ""
+  });
+}
 
-  return currentUser;
+
+
+export function changePassword(email, currentPassword, newPassword) {
+  const users = getUsers();
+
+  const user = users.find(u => u.email === email);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.password !== currentPassword) {
+    throw new Error("Wrong current password");
+  }
+
+  user.password = newPassword;
+
+  saveUsers(users);
+
+  return true;
 }
